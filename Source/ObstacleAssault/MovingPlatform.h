@@ -25,7 +25,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FVector PlatformVelocity;
-
+	
+	FVector StartLocation;
+	
 	UPROPERTY(EditAnywhere)
-	float MoveDistance = 0;
+	float MaxMoveDistances = 0;
 };
