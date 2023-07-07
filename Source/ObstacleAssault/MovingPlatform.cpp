@@ -8,15 +8,14 @@ AMovingPlatform::AMovingPlatform()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	StartLocation = GetActorLocation();
-
 }
 
 // Called every frame
@@ -24,13 +23,32 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	const float MovedDistance = FVector::Dist(GetActorLocation(), StartLocation);
-	if (MovedDistance > MaxMoveDistances)
-	{
-		SetActorLocation(StartLocation + PlatformVelocity.GetSafeNormal() * MaxMoveDistances);
-		PlatformVelocity = -PlatformVelocity;
-		StartLocation = GetActorLocation();
-	}
-	SetActorLocation(GetActorLocation() + PlatformVelocity * DeltaTime);
+	MovePlatform(DeltaTime);
+	RotatePlatform(DeltaTime);
 }
 
+double AMovingPlatform::GetDistanceMoved() const
+{
+	return FVector::Dist(GetActorLocation(), StartLocation);
+}
+
+bool AMovingPlatform::ShouldPlatformReturn() const
+{
+	return GetDistanceMoved() > MaxMoveDistance;
+}
+
+void AMovingPlatform::MovePlatform(float DeltaTime)
+{
+	if (ShouldPlatformReturn())
+	{
+		SetActorLocation(StartLocation + PlatformMovementVelocity.GetSafeNormal() * MaxMoveDistance);
+		PlatformMovementVelocity = -PlatformMovementVelocity;
+		StartLocation = GetActorLocation();
+	}
+	SetActorLocation(GetActorLocation() + PlatformMovementVelocity * DeltaTime);
+}
+
+void AMovingPlatform::RotatePlatform(float DeltaTime)
+{
+	AddActorLocalRotation(PlatformRotationVelocity * DeltaTime);
+}
